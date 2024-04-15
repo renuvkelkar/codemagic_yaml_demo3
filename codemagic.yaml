@@ -1,0 +1,36 @@
+workflows:
+  ios-workflow:
+    name: iOS Workflow
+    instance_type: mac_mini_m1
+    max_build_duration: 120
+    integrations:
+      app_store_connect: Renuka # <-- App Store Connect API name .. you will get it this form https://appstoreconnect.apple.com/access/integrations/api
+    environment:
+      ios_signing:
+        distribution_type: app_store # or: ad_hoc | development | enterprise
+        bundle_identifier: com.example.codemagicYamlDemo3
+      vars:
+        APP_ID: 6497226183 # <-- Put your APP ID here  .. this will get it form app information form appstoreconnect.
+      flutter: stable
+      xcode: latest # <-- set to specific version e.g. 14.3, 15.0 to avoid unexpected updates.
+      cocoapods: default
+    scripts:
+      - name: Set up code signing settings on Xcode project
+        script: |
+          xcode-project use-profiles
+      - name: Get Flutter packages
+        script: |
+          flutter packages pub get
+      - name: Install pods
+        script: |
+          find . -name "Podfile" -execdir pod install \;
+      # - name: Flutter analyze
+      #   script: |
+      #     flutter analyze
+      # - name: Flutter unit tests
+      #   script: |
+      #     flutter test
+      #   ignore_failure: true
+      - name: Flutter build ipa and automatic versioning
+        script: |
+          flutter build ipa --release \
